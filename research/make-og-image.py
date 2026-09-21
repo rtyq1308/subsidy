@@ -1,50 +1,59 @@
+"""사이트 히어로 디자인과 같은 톤의 Open Graph 썸네일을 만든다.
+
+색상은 public/styles.css의 값을 그대로 쓴다.
+크기는 Threads·카카오톡 링크 미리보기 기준 1200x630.
+"""
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1200, 630
-img = Image.new("RGB", (W, H), "#eefbff")
-d = ImageDraw.Draw(img)
+CREAM, INK, GREEN = "#f7f7f2", "#174e44", "#438f72"
+SOFT, CARD, MUTED = "#e9efe6", "#ffffff", "#5f6f66"
+
 bold = r"C:\Windows\Fonts\malgunbd.ttf"
 regular = r"C:\Windows\Fonts\malgun.ttf"
 
-# Soft background shapes
-d.ellipse((-130, -190, 430, 370), fill="#d4f4ff")
-d.ellipse((900, -210, 1360, 300), fill="#c9f0ef")
-d.polygon([(0, 500), (310, 340), (520, 630), (0, 630)], fill="#d9f7ef")
-d.polygon([(1200, 420), (1010, 300), (820, 630), (1200, 630)], fill="#d8ecff")
+img = Image.new("RGB", (W, H), CREAM)
+d = ImageDraw.Draw(img)
 
-# Top copy
-title_font = ImageFont.truetype(bold, 102)
-sub_font = ImageFont.truetype(regular, 35)
-button_font = ImageFont.truetype(bold, 61)
-footer_font = ImageFont.truetype(bold, 40)
-small_font = ImageFont.truetype(regular, 28)
+# 히어로 우측의 둥근 면
+d.ellipse((690, -150, 1330, 490), fill=SOFT)
+d.ellipse((905, 250, 1235, 580), fill="#dce8dd")
 
-title = "지원금 신청"
-box = d.textbbox((0, 0), title, font=title_font)
-d.text(((W - (box[2]-box[0]))/2, 65), title, font=title_font, fill="#102f67")
-d.text((W/2, 193), "놓치기 전에 받을 수 있는 혜택을 확인하세요", font=sub_font, fill="#34516f", anchor="ma")
+# 헤더 줄: 로고 마크와 사이트 이름
+d.rounded_rectangle((60, 46, 116, 102), 18, fill=INK)
+d.text((88, 74), "₩", font=ImageFont.truetype(bold, 34), fill=CREAM, anchor="mm")
+d.text((132, 74), "지원금 모음", font=ImageFont.truetype(bold, 36), fill=INK, anchor="lm")
+d.text((1140, 74), "지원 제도 안내", font=ImageFont.truetype(regular, 24), fill=MUTED, anchor="rm")
 
-# Illustration: documents, check, coin, graph
-d.rounded_rectangle((330, 270, 490, 390), 15, fill="#ffffff", outline="#2b6d91", width=5)
-d.line((365, 307, 390, 330, 432, 290), fill="#16a29a", width=10, joint="curve")
-d.line((365, 350, 445, 350), fill="#8fbcd0", width=9)
-d.ellipse((518, 282, 626, 390), fill="#fff4bf", outline="#ce8a21", width=6)
-d.text((572, 333), "₩", font=ImageFont.truetype(bold, 55), fill="#9d6719", anchor="mm")
-d.line((675, 382, 720, 340, 773, 360, 842, 285), fill="#143f73", width=9, joint="curve")
-d.polygon([(842, 285), (815, 294), (837, 315)], fill="#143f73")
-d.rectangle((685, 365, 713, 390), fill="#67c9c4")
-d.rectangle((737, 340, 765, 390), fill="#3ea7b8")
-d.rectangle((789, 310, 817, 390), fill="#1b7998")
+# 본문 카피
+d.text((60, 196), "내 상황에 맞는 혜택부터", font=ImageFont.truetype(bold, 26), fill=GREEN)
+d.text((60, 250), "지원금 모음,", font=ImageFont.truetype(bold, 72), fill=INK)
+d.text((60, 336), "나에게 맞는 혜택 찾기.", font=ImageFont.truetype(bold, 72), fill=GREEN)
+d.text((60, 470), "청년·중장년·가족·생활·일자리 지원을 한곳에.",
+       font=ImageFont.truetype(regular, 30), fill=MUTED)
+d.text((60, 516), "조건을 먼저 읽고 필요한 제도로 바로 이동하세요.",
+       font=ImageFont.truetype(regular, 30), fill=MUTED)
 
-# Oversized CTA button
-shadow = (246, 428, 962, 548)
-d.rounded_rectangle(shadow, 28, fill="#a9cbd7")
-d.rounded_rectangle((238, 416, 954, 536), 28, fill="#087b96")
-d.text((596, 475), "바로가기  ›", font=button_font, fill="white", anchor="mm")
+# 떠 있는 카드 두 장
+def card(box, label, title, angle):
+    w, h = box[2]-box[0], box[3]-box[1]
+    layer = Image.new("RGBA", (w+80, h+80), (0, 0, 0, 0))
+    ld = ImageDraw.Draw(layer)
+    ld.rounded_rectangle((40, 40, 40+w, 40+h), 20, fill=CARD)
+    ld.text((72, 68), label, font=ImageFont.truetype(regular, 22), fill=MUTED)
+    ld.text((72, 100), title, font=ImageFont.truetype(bold, 38), fill=INK)
+    layer = layer.rotate(angle, resample=Image.BICUBIC, expand=False)
+    img.paste(layer, (box[0]-40, box[1]-40), layer)
 
-# Footer strip, matching the preview card caption role
-d.rectangle((0, 574, W, H), fill="white")
-d.text((600, 602), "지원금 혜택 모두 받아보세요", font=footer_font, fill="#173453", anchor="mm")
-d.text((1120, 603), "지원금 모음", font=small_font, fill="#5c7589", anchor="rm")
+card((856, 122, 1136, 238), "월세", "주거 지원", -4)
+card((896, 262, 1176, 378), "훈련", "일자리 지원", 4)
 
-img.save(r"benefit-hub\public\og-benefit.png", optimize=True)
+# 별 모양 포인트
+cx, cy, r = 880, 452, 26
+d.line((cx-r, cy, cx+r, cy), fill=GREEN, width=6)
+d.line((cx, cy-r, cx, cy+r), fill=GREEN, width=6)
+d.line((cx-r*0.7, cy-r*0.7, cx+r*0.7, cy+r*0.7), fill=GREEN, width=6)
+d.line((cx-r*0.7, cy+r*0.7, cx+r*0.7, cy-r*0.7), fill=GREEN, width=6)
+
+img.save(r"public\og-benefit.png", optimize=True)
+print("public/og-benefit.png 생성")
