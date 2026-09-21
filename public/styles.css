@@ -24,3 +24,9 @@
 @media (max-width: 720px) {
   .ad-slot { margin: 20px 0; }
 }
+
+/* 그리드 안 광고는 한 줄을 통째로 차지한다. 모바일(1열)에서는 카드 사이에 그대로 들어간다. */
+.cards .ad-slot.in-grid {
+  grid-column: 1 / -1;
+  margin: 4px 0;
+}

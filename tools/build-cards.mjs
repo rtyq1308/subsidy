@@ -16,10 +16,29 @@ const tagClassOf = (category) => category === '가족' ? 'family'
   : category === '일자리' ? 'job'
   : category === '중장년' ? 'middle' : '';
 
-const cards = items.map((x) => {
+// 카드 3개마다 그리드 안에 인피드 광고를 넣는다(벤치마크와 같은 3:1 비율).
+// 모바일은 1열이라 카드 사이에 세로로, 데스크톱은 한 줄을 통째로 차지한다.
+const AD_EVERY = 3;
+const adUnit = () => '<aside class="ad-slot in-grid" aria-label="광고">'
+  + '<ins class="adsbygoogle" style="display:block"'
+  + ' data-ad-client="ca-pub-8832347985556850"'
+  + ' data-ad-slot="3755490673"'
+  + ' data-ad-format="auto"'
+  + ' data-full-width-responsive="true"></ins>'
+  + '<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>'
+  + '</aside>';
+
+const cardList = items.map((x) => {
   const destination = `<a class="wp-link" href="https://sub.itfinancelab.com/저장소/${x.wp}" target="_blank" rel="noopener noreferrer" aria-label="${esc(x.name)} 신청 안내 글 새 창에서 보기">지금 바로 신청하기 <span aria-hidden="true">→</span></a>`;
   return `<article class="card"><div class="card-top"><span class="tag ${tagClassOf(x.category)}">${esc(x.category)}</span><span class="status">${esc(x.status || '조건 확인')}</span></div><h3>${esc(x.name)}</h3><p class="benefit">${esc(x.benefit)}</p><p class="summary">${esc(x.summary)}</p><div class="card-actions">${destination}</div></article>`;
-}).join('');
+});
+
+const cards = cardList.reduce((out, card, index) => {
+  out.push(card);
+  const placed = index + 1;
+  if (placed % AD_EVERY === 0 && placed < cardList.length) out.push(adUnit());
+  return out;
+}, []).join('');
 
 let html = readFileSync('public/index.html', 'utf8');
 // 결과가 이미 최신이어도 성공해야 한다. 변경 여부가 아니라 패턴 일치 여부로 판단한다.

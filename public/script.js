@@ -24,6 +24,10 @@ const items = [
   {name:'중장년 경력지원제',category:'중장년',benefit:'중장년의 경력 전환·직무 경험 지원',summary:'참여 연령과 모집 직무, 운영기관별 참여 조건과 신청 기간을 확인하세요.',wp:2200,terms:'50대 60대 재취업 경력 전환 직무 경험'},
 ];
 const cards = document.querySelector('#cards');
+// 그리드 광고는 최초 1회만 생성·요청된다. render()가 카드를 다시 그릴 때
+// 노드를 새로 만들지 않고 떼었다 붙이기만 해서 노출이 중복 집계되지 않게 한다.
+const gridAds = [...cards.querySelectorAll('.ad-slot')];
+for (const ad of gridAds) ad.remove();
 const input = document.querySelector('#search-input');
 const filterBar = document.querySelector('#filters');
 const empty = document.querySelector('#empty');
@@ -40,6 +44,17 @@ function render(){
     const destination=`<a class="wp-link" href="https://sub.itfinancelab.com/저장소/${x.wp}" target="_blank" rel="noopener noreferrer" aria-label="${esc(x.name)} 신청 안내 글 새 창에서 보기">지금 바로 신청하기 <span aria-hidden="true">→</span></a>`;
     return `<article class="card"><div class="card-top"><span class="tag ${tagClass}">${esc(x.category)}</span><span class="status">${esc(x.status||'조건 확인')}</span></div><h3>${esc(x.name)}</h3><p class="benefit">${esc(x.benefit)}</p><p class="summary">${esc(x.summary)}</p><div class="card-actions">${destination}</div></article>`;
   }).join('');
+  placeAds(matched.length);
+}
+
+function placeAds(visible){
+  let used = 0;
+  for (let i = 3; i <= visible && used < gridAds.length; i += 3) {
+    if (i === visible) break;            // 마지막 카드 뒤에는 넣지 않는다
+    cards.insertBefore(gridAds[used], cards.children[i + used] || null);
+    used += 1;
+  }
+  for (let rest = used; rest < gridAds.length; rest += 1) gridAds[rest].remove();
 }
 input.addEventListener('input',render);
 filterBar.addEventListener('click',event=>{const button=event.target.closest('button[data-category]');if(!button)return;category=button.dataset.category;for(const item of filterBar.querySelectorAll('button'))item.setAttribute('aria-pressed',String(item===button));render();});
