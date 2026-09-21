@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://subsidy.itfinancelab.com/sitemap.xml
