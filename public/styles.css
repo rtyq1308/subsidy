@@ -9,3 +9,18 @@
 @keyframes cta-flash{0%,100%{background:#0969da;box-shadow:0 0 0 0 rgba(38,139,255,.1),0 7px 18px rgba(9,105,218,.24)}50%{background:#42a5ff;box-shadow:0 0 0 7px rgba(38,139,255,.18),0 10px 25px rgba(9,105,218,.38)}}
 @media(prefers-reduced-motion:reduce){.card-actions .wp-link{animation:none}}
 
+
+/* 광고 자리. 콘텐츠와 섞이지 않게 여백을 두고, 로드 전 레이아웃이 밀리지 않게 최소 높이를 잡는다. */
+.ad-slot {
+  display: block;
+  margin: 28px 0;
+  min-height: 100px;
+  overflow: hidden;
+}
+.ad-slot ins {
+  display: block;
+  width: 100%;
+}
+@media (max-width: 720px) {
+  .ad-slot { margin: 20px 0; }
+}
