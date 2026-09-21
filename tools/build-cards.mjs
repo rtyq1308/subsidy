@@ -22,11 +22,14 @@ const cards = items.map((x) => {
 }).join('');
 
 let html = readFileSync('public/index.html', 'utf8');
-const before = html;
+// 결과가 이미 최신이어도 성공해야 한다. 변경 여부가 아니라 패턴 일치 여부로 판단한다.
+let hitCards = 0;
+let hitCount = 0;
 html = html.replace(/(<div class="cards" id="cards">)[\s\S]*?(<\/div>\s*<div class="empty")/,
-  `$1${cards}$2`);
+  (_m, open, tail) => { hitCards += 1; return `${open}${cards}${tail}`; });
 html = html.replace(/(<p class="count" id="result-count">)[\s\S]*?(<\/p>)/,
-  `$1${items.length}개 제도$2`);
-if (html === before) throw new Error('index.html에서 카드 영역을 찾지 못했습니다.');
+  (_m, open, close) => { hitCount += 1; return `${open}${items.length}개 제도${close}`; });
+if (!hitCards) throw new Error('index.html에서 카드 영역을 찾지 못했습니다.');
+if (!hitCount) throw new Error('index.html에서 결과 개수 영역을 찾지 못했습니다.');
 writeFileSync('public/index.html', html);
 console.log(`카드 ${items.length}개를 index.html에 렌더링했습니다.`);
