@@ -1,16 +1,15 @@
-name: Deploy benefit-hub
+name: Deploy subsidy site
 
 on:
   push:
     branches: [main]
     paths:
       - 'public/**'
-      - 'wrangler.jsonc'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 concurrency:
-  group: deploy-benefit-hub
+  group: deploy-subsidy
   cancel-in-progress: true
 
 jobs:
@@ -26,4 +25,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '4'
-          command: deploy
+          command: pages deploy public --project-name=subsidy --branch=main
