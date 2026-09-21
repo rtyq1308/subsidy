@@ -45,4 +45,20 @@ input.addEventListener('input',render);
 filterBar.addEventListener('click',event=>{const button=event.target.closest('button[data-category]');if(!button)return;category=button.dataset.category;for(const item of filterBar.querySelectorAll('button'))item.setAttribute('aria-pressed',String(item===button));render();});
 render();
 
+// 어떤 제도가 실제로 눌리는지 본다. 사전 렌더링된 카드와 런타임 카드 모두 잡히도록 위임한다.
+document.addEventListener('click', event => {
+  const link = event.target.closest('a.wp-link');
+  if (!link || typeof gtag !== 'function') return;
+  const card = link.closest('.card');
+  gtag('event', 'benefit_click', {
+    benefit_name: card ? card.querySelector('h3').textContent.trim() : '',
+    benefit_category: card ? card.querySelector('.tag').textContent.trim() : '',
+    wp_url: link.href,
+  });
+});
 
+filterBar.addEventListener('click', event => {
+  const button = event.target.closest('button[data-category]');
+  if (!button || typeof gtag !== 'function') return;
+  gtag('event', 'filter_select', { filter_category: button.dataset.category });
+});
