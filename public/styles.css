@@ -4,10 +4,10 @@
 
 /* WordPress 상세 글 버튼 */
 .card-actions{width:100%;}
-.card-actions .wp-link{display:flex;width:100%;min-height:52px;align-items:center;justify-content:center;gap:10px;border-radius:12px;background:#0969da;color:#fff;font-size:15px;font-weight:800;box-shadow:0 7px 18px rgba(9,105,218,.26);animation:cta-flash 1s ease-in-out infinite;}
-.card-actions .wp-link:hover{background:#0757b7;transform:translateY(-1px);}
+.card-actions .cta{display:flex;width:100%;min-height:52px;align-items:center;justify-content:center;gap:10px;border-radius:12px;background:#0969da;color:#fff;font-size:15px;font-weight:800;box-shadow:0 7px 18px rgba(9,105,218,.26);animation:cta-flash 1s ease-in-out infinite;}
+.card-actions .cta:hover{background:#0757b7;transform:translateY(-1px);}
 @keyframes cta-flash{0%,100%{background:#0969da;box-shadow:0 0 0 0 rgba(38,139,255,.1),0 7px 18px rgba(9,105,218,.24)}50%{background:#42a5ff;box-shadow:0 0 0 7px rgba(38,139,255,.18),0 10px 25px rgba(9,105,218,.38)}}
-@media(prefers-reduced-motion:reduce){.card-actions .wp-link{animation:none}}
+@media(prefers-reduced-motion:reduce){.card-actions .cta{animation:none}}
 
 
 /* 광고 자리. 콘텐츠와 섞이지 않게 여백을 두고, 로드 전 레이아웃이 밀리지 않게 최소 높이를 잡는다. */
@@ -30,3 +30,28 @@
   grid-column: 1 / -1;
   margin: 4px 0;
 }
+
+/* 카드 전체가 버튼이다. 강조 점멸은 하단 CTA 막대에만 준다. */
+.cards a.card {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.cards a.card:hover .cta { background: #0757b7; }
+.cards a.card:focus-visible { outline: 3px solid #eba33b; outline-offset: 3px; }
+.card-actions .cta {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 12px;
+  background: #0969da;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow: 0 7px 18px rgba(9,105,218,.26);
+  animation: cta-flash 1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) { .card-actions .cta { animation: none; } }
