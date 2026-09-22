@@ -14,7 +14,7 @@
   <meta property="og:site_name" content="지원금 모음">
   <meta property="og:url" content="https://subsidy.itfinancelab.com/">
   <meta property="og:title" content="지원금 신청 바로가기">
-  <meta property="og:description" content="지원금 혜택 모두 받아보세요">
+  <meta property="og:description" content="지원금 모음에서 청년·중장년·가족·생활·일자리 지원금과 신청 정보를 한눈에 확인하세요.">
   <meta property="og:image" content="https://subsidy.itfinancelab.com/og-benefit-v2.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -35,12 +35,12 @@
     gtag('config', 'G-EZWW0615H1');
   </script>
   <title>지원금 모음 | 나에게 맞는 정부지원금 찾기</title>
-  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <header class="site-header">
-    <a class="logo" href="./" aria-label="지원금 모음 홈"><span class="logo-mark" aria-hidden="true">₩</span><span>지원금 모음</span></a>
+    <a class="logo" href="/" aria-label="지원금 모음 홈"><span class="logo-mark" aria-hidden="true">₩</span><span>지원금 모음</span></a>
     <span class="header-note">지원 제도 안내</span>
   </header>
   <main>
@@ -56,7 +56,7 @@
       <div class="finder-bar">
       <div class="finder-top"><div><p class="eyebrow">FIND YOUR BENEFIT</p><h2>어떤 지원이 궁금하세요?</h2></div><p class="count" id="result-count">23개 제도</p></div>
       <label class="search"><span class="search-icon" aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="예: 월세, 취업, 자녀, 의료비" autocomplete="off"><span class="search-hint">검색</span></label>
-      <div class="filters" id="filters" role="group" aria-label="분야별 보기"><button type="button" data-category="전체" aria-pressed="true">전체</button><button type="button" data-category="중장년" aria-pressed="false">40·50·60대</button><button type="button" data-category="청년·주거" aria-pressed="false">청년·주거</button><button type="button" data-category="일자리" aria-pressed="false">일자리</button><button type="button" data-category="가족" aria-pressed="false">가족</button><button type="button" data-category="생활·의료" aria-pressed="false">생활·의료</button></div>
+      <div class="filters" id="filters" role="group" aria-label="분야별 보기"><a href="/" data-category="전체" aria-pressed="true">전체</a><a href="/senior/" data-category="중장년" aria-pressed="false">40·50·60대</a><a href="/youth/" data-category="청년·주거" aria-pressed="false">청년·주거</a><a href="/job/" data-category="일자리" aria-pressed="false">일자리</a><a href="/family/" data-category="가족" aria-pressed="false">가족</a><a href="/life/" data-category="생활·의료" aria-pressed="false">생활·의료</a></div>
       </div>
       <aside class="ad-slot" aria-label="광고">
         <!-- subsidy-top -->
@@ -73,7 +73,8 @@
     <section class="note"><strong>확인 안내</strong><p>지원 대상·금액·신청 기간은 개인 상황과 공고에 따라 달라집니다. 상세 글에서 조건과 신청 시기를 확인해 주세요. 이 페이지는 신청이나 자격 판정을 대신하지 않습니다.</p><p class="updated">정보 확인: 2026년 9월 21일</p></section>
   </main>
   <footer><span>지원금 모음</span><span>지원 제도 정보 모음</span></footer>
-  <script src="./script.js" defer></script>
+  <script>window.CATEGORY="전체";</script>
+  <script src="/script.js" defer></script>
 </body>
 </html>
 

@@ -32,16 +32,20 @@ const input = document.querySelector('#search-input');
 const filterBar = document.querySelector('#filters');
 const empty = document.querySelector('#empty');
 const count = document.querySelector('#result-count');
-let category = '전체';
+// 분야는 페이지가 정한다. 필터는 링크라 자바스크립트가 바꾸지 않는다.
+const category = window.CATEGORY || '전체';
+
 function esc(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
 function render(){
-  const query=input.value.trim().toLocaleLowerCase('ko');
-  const matched=items.filter(x=>(category==='전체'||x.category===category)&&`${x.name} ${x.category} ${x.terms} ${x.summary}`.toLocaleLowerCase('ko').includes(query));
-  count.textContent=`${matched.length}개 제도`;
-  empty.hidden=matched.length>0;
-  cards.innerHTML=matched.map(x=>{
-    const tagClass=x.category==='가족'?'family':x.category==='생활·의료'?'life':x.category==='일자리'?'job':x.category==='중장년'?'middle':'';
-    const cta=`<span class="cta">지금 바로 신청하기 <span aria-hidden="true">→</span></span>`;
+  const query = input.value.trim().toLocaleLowerCase('ko');
+  const matched = items.filter(x => (category === '전체' || x.category === category)
+    && `${x.name} ${x.category} ${x.terms} ${x.summary}`.toLocaleLowerCase('ko').includes(query));
+  count.textContent = `${matched.length}개 제도`;
+  empty.hidden = matched.length > 0;
+  cards.innerHTML = matched.map(x => {
+    const tagClass = x.category==='가족'?'family':x.category==='생활·의료'?'life':x.category==='일자리'?'job':x.category==='중장년'?'middle':'';
+    const cta = `<span class="cta">지금 바로 신청하기 <span aria-hidden="true">→</span></span>`;
     return `<a class="card" href="https://sub.itfinancelab.com/저장소/${x.wp}" aria-label="${esc(x.name)} 신청 안내 글 보기"><div class="card-top"><span class="tag ${tagClass}">${esc(x.category)}</span><span class="status">${esc(x.status||'조건 확인')}</span></div><h3>${esc(x.name)}</h3><p class="benefit">${esc(x.benefit)}</p><div class="card-actions">${cta}</div></a>`;
   }).join('');
   placeAds(matched.length);
@@ -56,40 +60,24 @@ function placeAds(visible){
   }
   for (let rest = used; rest < gridAds.length; rest += 1) gridAds[rest].remove();
 }
-input.addEventListener('input',render);
-// 분야마다 고유 주소를 준다. 링크를 공유하면 그 분야가 바로 열린다.
-const SLUGS = {
-  '전체': 'all',
-  '중장년': 'senior',
-  '청년·주거': 'youth',
-  '일자리': 'job',
-  '가족': 'family',
-  '생활·의료': 'life',
-};
-const BY_SLUG = Object.fromEntries(Object.entries(SLUGS).map(([name, slug]) => [slug, name]));
 
-function selectCategory(name, {updateHash = true} = {}){
-  if (!SLUGS[name]) return;
-  category = name;
-  for (const item of filterBar.querySelectorAll('button')) {
-    item.setAttribute('aria-pressed', String(item.dataset.category === name));
-  }
-  render();
-  if (updateHash) {
-    // replaceState라 주소만 바뀌고 화면이 위로 튀지 않는다.
-    history.replaceState(null, '', name === '전체' ? location.pathname + location.search : '#' + SLUGS[name]);
-  }
-}
+input.addEventListener('input', render);
 
-filterBar.addEventListener('click', event => {
-  const button = event.target.closest('button[data-category]');
-  if (!button) return;
-  selectCategory(button.dataset.category);
+// 어떤 제도가 실제로 눌리는지 본다.
+document.addEventListener('click', event => {
+  const link = event.target.closest('a.card');
+  if (!link || typeof gtag !== 'function') return;
+  gtag('event', 'benefit_click', {
+    benefit_name: link.querySelector('h3').textContent.trim(),
+    benefit_category: link.querySelector('.tag').textContent.trim(),
+    wp_url: link.href,
+  });
 });
 
-window.addEventListener('hashchange', () => {
-  const name = BY_SLUG[location.hash.slice(1)];
-  if (name && name !== category) selectCategory(name, {updateHash: false});
+filterBar.addEventListener('click', event => {
+  const link = event.target.closest('a[data-category]');
+  if (!link || typeof gtag !== 'function') return;
+  gtag('event', 'filter_select', { filter_category: link.dataset.category });
 });
 
 // 막대가 상단에 붙었을 때만 그림자를 준다.
@@ -102,23 +90,3 @@ if (finderBar && 'IntersectionObserver' in window) {
     {threshold: 1}
   ).observe(sentinel);
 }
-
-selectCategory(BY_SLUG[location.hash.slice(1)] || '전체', {updateHash: false});
-
-// 어떤 제도가 실제로 눌리는지 본다. 사전 렌더링된 카드와 런타임 카드 모두 잡히도록 위임한다.
-document.addEventListener('click', event => {
-  const link = event.target.closest('a.card');
-  if (!link || typeof gtag !== 'function') return;
-  const card = link.closest('.card');
-  gtag('event', 'benefit_click', {
-    benefit_name: card ? card.querySelector('h3').textContent.trim() : '',
-    benefit_category: card ? card.querySelector('.tag').textContent.trim() : '',
-    wp_url: link.href,
-  });
-});
-
-filterBar.addEventListener('click', event => {
-  const button = event.target.closest('button[data-category]');
-  if (!button || typeof gtag !== 'function') return;
-  gtag('event', 'filter_select', { filter_category: button.dataset.category });
-});

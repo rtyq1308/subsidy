@@ -80,7 +80,7 @@
   .finder-bar .search { height: 48px; margin: 10px 0; }
   .finder-bar .filters { flex-wrap: nowrap; overflow-x: auto; margin: 0 -14px 4px; padding: 0 14px 6px; scrollbar-width: none; }
   .finder-bar .filters::-webkit-scrollbar { display: none; }
-  .finder-bar .filters button { flex: 0 0 auto; }
+  .finder-bar .filters a, .finder-bar .filters button { flex: 0 0 auto; }
 }
 
 /* 필터를 한 덩어리 바로 묶고 전체 높이를 줄인다. */
@@ -102,7 +102,7 @@
   border-radius: 999px;
   box-shadow: 0 2px 8px rgba(23,62,52,.05);
 }
-.finder-bar .filters button {
+.finder-bar .filters a, .finder-bar .filters button {
   flex: 1 1 0;
   min-width: 0;
   border: 0;
@@ -115,8 +115,8 @@
   white-space: nowrap;
   transition: background .15s, color .15s;
 }
-.finder-bar .filters button:hover { background: #eef3ed; color: #23503f; }
-.finder-bar .filters button[aria-pressed="true"] {
+.finder-bar .filters a, .finder-bar .filters button:hover { background: #eef3ed; color: #23503f; }
+.finder-bar .filters a, .finder-bar .filters button[aria-pressed="true"] {
   background: #174e44;
   border-color: #174e44;
   color: #fff;
@@ -124,6 +124,14 @@
 }
 @media (max-width: 700px) {
   .finder-bar .filters { border-radius: 16px; overflow-x: auto; margin: 0 0 4px; padding: 4px; }
-  .finder-bar .filters button { flex: 0 0 auto; padding: 8px 13px; font-size: 12px; }
+  .finder-bar .filters a, .finder-bar .filters button { flex: 0 0 auto; padding: 8px 13px; font-size: 12px; }
   .finder-bar .search { height: 42px; }
+}
+
+/* 필터는 이제 실제 페이지 링크다. */
+.finder-bar .filters a {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
