@@ -41,7 +41,7 @@ function render(){
   empty.hidden=matched.length>0;
   cards.innerHTML=matched.map(x=>{
     const tagClass=x.category==='가족'?'family':x.category==='생활·의료'?'life':x.category==='일자리'?'job':x.category==='중장년'?'middle':'';
-    const destination=`<a class="wp-link" href="https://sub.itfinancelab.com/저장소/${x.wp}" target="_blank" rel="noopener noreferrer" aria-label="${esc(x.name)} 신청 안내 글 새 창에서 보기">지금 바로 신청하기 <span aria-hidden="true">→</span></a>`;
+    const destination=`<a class="wp-link" href="https://sub.itfinancelab.com/저장소/${x.wp}" aria-label="${esc(x.name)} 신청 안내 글 보기">지금 바로 신청하기 <span aria-hidden="true">→</span></a>`;
     return `<article class="card"><div class="card-top"><span class="tag ${tagClass}">${esc(x.category)}</span><span class="status">${esc(x.status||'조건 확인')}</span></div><h3>${esc(x.name)}</h3><p class="benefit">${esc(x.benefit)}</p><p class="summary">${esc(x.summary)}</p><div class="card-actions">${destination}</div></article>`;
   }).join('');
   placeAds(matched.length);

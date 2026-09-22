@@ -29,7 +29,7 @@ const adUnit = () => '<aside class="ad-slot in-grid" aria-label="광고">'
   + '</aside>';
 
 const cardList = items.map((x) => {
-  const destination = `<a class="wp-link" href="https://sub.itfinancelab.com/저장소/${x.wp}" target="_blank" rel="noopener noreferrer" aria-label="${esc(x.name)} 신청 안내 글 새 창에서 보기">지금 바로 신청하기 <span aria-hidden="true">→</span></a>`;
+  const destination = `<a class="wp-link" href="https://sub.itfinancelab.com/저장소/${x.wp}" aria-label="${esc(x.name)} 신청 안내 글 보기">지금 바로 신청하기 <span aria-hidden="true">→</span></a>`;
   return `<article class="card"><div class="card-top"><span class="tag ${tagClassOf(x.category)}">${esc(x.category)}</span><span class="status">${esc(x.status || '조건 확인')}</span></div><h3>${esc(x.name)}</h3><p class="benefit">${esc(x.benefit)}</p><p class="summary">${esc(x.summary)}</p><div class="card-actions">${destination}</div></article>`;
 });
 
