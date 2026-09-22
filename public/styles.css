@@ -135,3 +135,47 @@
   align-items: center;
   justify-content: center;
 }
+
+/* 검색창을 없앤 자리에 필터를 크게 배치한다. 강조색은 CTA와 같은 파란색으로 통일. */
+.finder-bar { padding: 12px 36px 10px; }
+.finder-bar .filters {
+  gap: 4px;
+  margin: 12px 0 6px;
+  padding: 6px;
+  border-radius: 16px;
+}
+.finder-bar .filters a,
+.finder-bar .filters button {
+  min-height: 48px;
+  padding: 12px 10px;
+  font-size: 15px;
+  font-weight: 800;
+  border-radius: 12px;
+  letter-spacing: -.02em;
+}
+.finder-bar .filters a:hover,
+.finder-bar .filters button:hover { background: #eaf2fd; color: #0757b7; }
+.finder-bar .filters a[aria-pressed="true"],
+.finder-bar .filters button[aria-pressed="true"] {
+  background: #0969da;
+  border-color: #0969da;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(9,105,218,.28);
+}
+@media (max-width: 700px) {
+  .finder-bar .filters {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: visible;
+    gap: 6px;
+    padding: 8px;
+  }
+  .finder-bar .filters a,
+  .finder-bar .filters button {
+    min-height: 52px;
+    padding: 12px 6px;
+    font-size: 15px;
+    white-space: normal;
+    line-height: 1.25;
+  }
+}

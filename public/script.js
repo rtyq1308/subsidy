@@ -23,45 +23,8 @@ const items = [
   {name:'국민연금 실업크레딧',category:'중장년',benefit:'연금보험료 최대 75% 지원',summary:'구직급여 수급자가 신청할 수 있으며, 생애 최대 12개월까지 가입기간으로 인정됩니다.',wp:2198,terms:'40대 50대 실직 구직급여 국민연금 보험료'},
   {name:'중장년 경력지원제',category:'중장년',benefit:'중장년의 경력 전환·직무 경험 지원',summary:'참여 연령과 모집 직무, 운영기관별 참여 조건과 신청 기간을 확인하세요.',wp:2200,terms:'50대 60대 재취업 경력 전환 직무 경험'},
 ];
-const cards = document.querySelector('#cards');
-// 그리드 광고는 최초 1회만 생성·요청된다. render()가 카드를 다시 그릴 때
-// 노드를 새로 만들지 않고 떼었다 붙이기만 해서 노출이 중복 집계되지 않게 한다.
-const gridAds = [...cards.querySelectorAll('.ad-slot')];
-for (const ad of gridAds) ad.remove();
-const input = document.querySelector('#search-input');
-const filterBar = document.querySelector('#filters');
-const empty = document.querySelector('#empty');
-const count = document.querySelector('#result-count');
-// 분야는 페이지가 정한다. 필터는 링크라 자바스크립트가 바꾸지 않는다.
-const category = window.CATEGORY || '전체';
-
-function esc(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-
-function render(){
-  const query = input.value.trim().toLocaleLowerCase('ko');
-  const matched = items.filter(x => (category === '전체' || x.category === category)
-    && `${x.name} ${x.category} ${x.terms} ${x.summary}`.toLocaleLowerCase('ko').includes(query));
-  count.textContent = `${matched.length}개 제도`;
-  empty.hidden = matched.length > 0;
-  cards.innerHTML = matched.map(x => {
-    const tagClass = x.category==='가족'?'family':x.category==='생활·의료'?'life':x.category==='일자리'?'job':x.category==='중장년'?'middle':'';
-    const cta = `<span class="cta">지금 바로 신청하기 <span aria-hidden="true">→</span></span>`;
-    return `<a class="card" href="https://sub.itfinancelab.com/저장소/${x.wp}" aria-label="${esc(x.name)} 신청 안내 글 보기"><div class="card-top"><span class="tag ${tagClass}">${esc(x.category)}</span><span class="status">${esc(x.status||'조건 확인')}</span></div><h3>${esc(x.name)}</h3><p class="benefit">${esc(x.benefit)}</p><div class="card-actions">${cta}</div></a>`;
-  }).join('');
-  placeAds(matched.length);
-}
-
-function placeAds(visible){
-  let used = 0;
-  for (let i = 3; i <= visible && used < gridAds.length; i += 3) {
-    if (i === visible) break;            // 마지막 카드 뒤에는 넣지 않는다
-    cards.insertBefore(gridAds[used], cards.children[i + used] || null);
-    used += 1;
-  }
-  for (let rest = used; rest < gridAds.length; rest += 1) gridAds[rest].remove();
-}
-
-input.addEventListener('input', render);
+// 카드와 광고는 빌드 시점에 페이지에 박힌다. 이 파일은 데이터 원본과 추적만 담당한다.
+// 예전처럼 innerHTML을 다시 쓰면 그리드 광고가 지워지므로 렌더링을 하지 않는다.
 
 // 어떤 제도가 실제로 눌리는지 본다.
 document.addEventListener('click', event => {
@@ -74,11 +37,14 @@ document.addEventListener('click', event => {
   });
 });
 
-filterBar.addEventListener('click', event => {
-  const link = event.target.closest('a[data-category]');
-  if (!link || typeof gtag !== 'function') return;
-  gtag('event', 'filter_select', { filter_category: link.dataset.category });
-});
+const filterBar = document.querySelector('#filters');
+if (filterBar) {
+  filterBar.addEventListener('click', event => {
+    const link = event.target.closest('a[data-category]');
+    if (!link || typeof gtag !== 'function') return;
+    gtag('event', 'filter_select', { filter_category: link.dataset.category });
+  });
+}
 
 // 막대가 상단에 붙었을 때만 그림자를 준다.
 const finderBar = document.querySelector('.finder-bar');
