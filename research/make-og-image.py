@@ -55,5 +55,5 @@ d.line((cx, cy-r, cx, cy+r), fill=GREEN, width=6)
 d.line((cx-r*0.7, cy-r*0.7, cx+r*0.7, cy+r*0.7), fill=GREEN, width=6)
 d.line((cx-r*0.7, cy+r*0.7, cx+r*0.7, cy-r*0.7), fill=GREEN, width=6)
 
-img.save(r"public\og-benefit.png", optimize=True)
+img.save(r"public\og-benefit-v2.png", optimize=True)
 print("public/og-benefit.png 생성")
