@@ -57,8 +57,53 @@ function placeAds(visible){
   for (let rest = used; rest < gridAds.length; rest += 1) gridAds[rest].remove();
 }
 input.addEventListener('input',render);
-filterBar.addEventListener('click',event=>{const button=event.target.closest('button[data-category]');if(!button)return;category=button.dataset.category;for(const item of filterBar.querySelectorAll('button'))item.setAttribute('aria-pressed',String(item===button));render();});
-render();
+// 분야마다 고유 주소를 준다. 링크를 공유하면 그 분야가 바로 열린다.
+const SLUGS = {
+  '전체': 'all',
+  '중장년': 'senior',
+  '청년·주거': 'youth',
+  '일자리': 'job',
+  '가족': 'family',
+  '생활·의료': 'life',
+};
+const BY_SLUG = Object.fromEntries(Object.entries(SLUGS).map(([name, slug]) => [slug, name]));
+
+function selectCategory(name, {updateHash = true} = {}){
+  if (!SLUGS[name]) return;
+  category = name;
+  for (const item of filterBar.querySelectorAll('button')) {
+    item.setAttribute('aria-pressed', String(item.dataset.category === name));
+  }
+  render();
+  if (updateHash) {
+    // replaceState라 주소만 바뀌고 화면이 위로 튀지 않는다.
+    history.replaceState(null, '', name === '전체' ? location.pathname + location.search : '#' + SLUGS[name]);
+  }
+}
+
+filterBar.addEventListener('click', event => {
+  const button = event.target.closest('button[data-category]');
+  if (!button) return;
+  selectCategory(button.dataset.category);
+});
+
+window.addEventListener('hashchange', () => {
+  const name = BY_SLUG[location.hash.slice(1)];
+  if (name && name !== category) selectCategory(name, {updateHash: false});
+});
+
+// 막대가 상단에 붙었을 때만 그림자를 준다.
+const finderBar = document.querySelector('.finder-bar');
+if (finderBar && 'IntersectionObserver' in window) {
+  const sentinel = document.createElement('div');
+  finderBar.parentNode.insertBefore(sentinel, finderBar);
+  new IntersectionObserver(
+    ([entry]) => finderBar.classList.toggle('is-stuck', !entry.isIntersecting),
+    {threshold: 1}
+  ).observe(sentinel);
+}
+
+selectCategory(BY_SLUG[location.hash.slice(1)] || '전체', {updateHash: false});
 
 // 어떤 제도가 실제로 눌리는지 본다. 사전 렌더링된 카드와 런타임 카드 모두 잡히도록 위임한다.
 document.addEventListener('click', event => {

@@ -55,3 +55,30 @@
   animation: cta-flash 1s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) { .card-actions .cta { animation: none; } }
+
+/* 검색·필터 막대는 스크롤해도 위에 붙어 있다. */
+.finder-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #f7f7f2;
+  margin: 0 -36px;
+  padding: 14px 36px 10px;
+  border-bottom: 1px solid transparent;
+  transition: box-shadow .2s, border-color .2s;
+}
+.finder-bar.is-stuck {
+  border-bottom-color: #e2e8dd;
+  box-shadow: 0 6px 18px rgba(23,62,52,.06);
+}
+.finder-bar .search { margin: 16px 0 14px; }
+.finder-bar .filters { margin-bottom: 4px; }
+@media (max-width: 600px) {
+  .finder-bar { margin: 0 -14px; padding: 10px 14px 8px; }
+  .finder-bar .finder-top h2 { font-size: 20px; }
+  .finder-bar .eyebrow { display: none; }
+  .finder-bar .search { height: 48px; margin: 10px 0; }
+  .finder-bar .filters { flex-wrap: nowrap; overflow-x: auto; margin: 0 -14px 4px; padding: 0 14px 6px; scrollbar-width: none; }
+  .finder-bar .filters::-webkit-scrollbar { display: none; }
+  .finder-bar .filters button { flex: 0 0 auto; }
+}
