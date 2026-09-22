@@ -82,3 +82,48 @@
   .finder-bar .filters::-webkit-scrollbar { display: none; }
   .finder-bar .filters button { flex: 0 0 auto; }
 }
+
+/* 필터를 한 덩어리 바로 묶고 전체 높이를 줄인다. */
+.finder-bar { padding: 10px 36px 8px; }
+.finder-bar .eyebrow { display: none; }
+.finder-bar .finder-top h2 { font-size: 21px; }
+.finder-bar .count { font-size: 12px; }
+.finder-bar .search { height: 46px; margin: 10px 0; border-radius: 12px; }
+.finder-bar .search-icon { font-size: 24px; }
+.finder-bar .search input { font-size: 14px; }
+
+.finder-bar .filters {
+  display: flex;
+  gap: 2px;
+  margin: 0 0 4px;
+  padding: 5px;
+  background: #fff;
+  border: 1px solid #e4e9e1;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(23,62,52,.05);
+}
+.finder-bar .filters button {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #5d6d65;
+  border-radius: 999px;
+  padding: 9px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.finder-bar .filters button:hover { background: #eef3ed; color: #23503f; }
+.finder-bar .filters button[aria-pressed="true"] {
+  background: #174e44;
+  border-color: #174e44;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(23,78,68,.25);
+}
+@media (max-width: 700px) {
+  .finder-bar .filters { border-radius: 16px; overflow-x: auto; margin: 0 0 4px; padding: 4px; }
+  .finder-bar .filters button { flex: 0 0 auto; padding: 8px 13px; font-size: 12px; }
+  .finder-bar .search { height: 42px; }
+}
