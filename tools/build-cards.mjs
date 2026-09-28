@@ -2,7 +2,7 @@
  * script.js의 items로 분야별 정적 페이지를 만든다.
  *
  * 필터를 자바스크립트가 아니라 실제 페이지 이동으로 처리한다.
- *   - 페이지가 6개로 늘어 네이버에 색인될 주소가 늘어난다
+ *   - 분야별 페이지를 만들어 네이버에 색인될 주소를 늘린다
  *   - 페이지 이동이 생기므로 애드센스 전면광고가 트리거될 수 있다
  *   - 크롤러가 JS 없이도 제도 내용을 읽는다
  *
@@ -17,7 +17,10 @@ const AD_EVERY = 3;
 const CATEGORIES = [
   { slug: '', name: '전체', label: '전체',
     title: '지원금 모음 | 나에게 맞는 정부지원금 찾기',
-    desc: '지원금 모음에서 청년·중장년·가족·생활·일자리 지원금과 신청 정보를 한눈에 확인하세요.' },
+    desc: '지원금 모음에서 청년·중장년·가족 지원금과 정책대출·환급 정보를 한눈에 확인하세요.' },
+  { slug: 'finance', name: '대출·환급', label: '대출·환급',
+    title: '정책대출·환급 모음 | 보금자리론·디딤돌·버팀목',
+    desc: '보금자리론, 디딤돌대출, 청년전용 버팀목전세자금, 소상공인 정책자금과 세금 경정청구를 확인하세요.' },
   { slug: 'senior', name: '중장년', label: '40·50·60대',
     title: '40·50·60대 지원금 모음 | 실업급여·연금·일자리',
     desc: '40대 이후 받을 수 있는 실업급여, 국민연금, 주택연금, 노인일자리 등 중장년 지원 제도를 정리했습니다.' },
@@ -46,7 +49,8 @@ const esc = (value) => String(value).replace(/[&<>"']/g, (c) => ({
 const tagClassOf = (category) => category === '가족' ? 'family'
   : category === '생활·의료' ? 'life'
   : category === '일자리' ? 'job'
-  : category === '중장년' ? 'middle' : '';
+  : category === '중장년' ? 'middle'
+  : category === '대출·환급' ? 'finance' : '';
 
 const adUnit = () => '<aside class="ad-slot in-grid" aria-label="광고">'
   + '<ins class="adsbygoogle" style="display:block"'
@@ -109,9 +113,9 @@ for (const category of CATEGORIES) {
 
   if (category.slug) {
     mkdirSync(`public/${category.slug}`, { recursive: true });
-    writeFileSync(`public/${category.slug}/index.html`, html);
+    writeFileSync(`public/${category.slug}/index.html`, html.trimEnd() + '\n');
   } else {
-    writeFileSync('public/index.html', html);
+    writeFileSync('public/index.html', html.trimEnd() + '\n');
   }
   made += 1;
 }
