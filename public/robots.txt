@@ -39,3 +39,5 @@ User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://subsidy.itfinancelab.com/sitemap.xml
+
+#DaumWebMasterTool:7c638e9d1f6ee7c0ea11949493030943fa7171383f1ff6643764251648903002:jFYtrG8dYK+3XeBcGgtb4Q==
