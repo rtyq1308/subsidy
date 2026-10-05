@@ -181,3 +181,48 @@
     line-height: 1.25;
   }
 }
+
+/* 제도 비교표. 표가 넓어도 페이지 전체가 아니라 표 안에서만 가로로 밀린다. */
+.compare { margin: 56px 36px 0; }
+.compare h2 { font-size: 24px; letter-spacing: -.05em; margin: 0 0 8px; color: #173d34; }
+.compare-desc { font-size: 14px; color: #66766e; margin: 0 0 16px; line-height: 1.7; word-break: keep-all; }
+.table-wrap { overflow-x: auto; background: #fff; border: 1px solid #e4e9e1; border-radius: 16px; }
+.compare table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 14px; line-height: 1.6; }
+.compare th, .compare td { padding: 14px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid #eef1ea; word-break: keep-all; }
+.compare thead th { background: #f3f6f1; color: #4b5f57; font-size: 12px; font-weight: 800; }
+.compare tbody tr:last-child th, .compare tbody tr:last-child td { border-bottom: 0; }
+.compare tbody th { width: 24%; font-weight: 800; color: #1c302c; }
+.compare tbody th a { color: #0757b7; text-decoration: none; }
+.compare tbody th a:hover { text-decoration: underline; }
+.compare td:nth-child(2) { width: 28%; color: #237756; font-weight: 700; }
+.compare td:nth-child(3) { color: #5d6d65; }
+.row-note { display: block; margin-top: 4px; font-size: 11px; font-weight: 700; color: #75817b; }
+
+/* 하단 분야 링크 */
+.footer-nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.footer-nav a { color: #6c7a72; text-decoration: none; }
+.footer-nav a:hover { color: #23503f; text-decoration: underline; }
+
+/* 운영 안내 페이지 */
+.about { max-width: 760px; padding: 8px 36px 40px; color: #33463f; line-height: 1.85; word-break: keep-all; }
+.about h1 { font-size: 38px; letter-spacing: -.06em; color: #173d34; margin: 24px 0 8px; }
+.about-lead { font-size: 16px; color: #55706a; margin: 0 0 36px; }
+.about section { background: #fff; border: 1px solid #e4e9e1; border-radius: 18px; padding: 24px 28px; margin-bottom: 16px; }
+.about h2 { font-size: 20px; letter-spacing: -.04em; color: #173d34; margin: 0 0 8px; }
+.about p { margin: 8px 0 0; font-size: 15px; }
+.about ul { margin: 8px 0 0; padding-left: 20px; font-size: 15px; }
+.about li + li { margin-top: 6px; }
+.about a { color: #0757b7; }
+.about-back { margin-top: 28px; }
+
+@media (max-width: 600px) {
+  .compare { margin: 40px 14px 0; }
+  .compare h2 { font-size: 20px; }
+  .compare table { font-size: 13px; }
+  .compare th, .compare td { padding: 12px; }
+  .footer-nav { margin-top: 8px; }
+  .footer-nav a { display: inline; margin: 0; }
+  .about { padding: 0 16px 30px; }
+  .about h1 { font-size: 30px; }
+  .about section { padding: 20px; }
+}

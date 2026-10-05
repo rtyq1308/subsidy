@@ -29,3 +29,9 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '4'
           command: pages deploy public --project-name=subsidy --branch=main
+      # 검색엔진 통보가 실패해도 배포는 이미 끝났으므로 작업을 실패로 만들지 않는다.
+      - name: IndexNow로 네이버·빙에 변경 알림
+        continue-on-error: true
+        run: |
+          sleep 30
+          node tools/indexnow.mjs
