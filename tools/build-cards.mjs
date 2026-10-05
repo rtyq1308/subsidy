@@ -14,6 +14,7 @@
  * 사용: node tools/build-cards.mjs
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { DETAILS } from './details.mjs';
 
 const SITE = 'https://subsidy.itfinancelab.com';
 const SITE_NAME = '지원금 모음';
@@ -73,6 +74,10 @@ const esc = (value) => String(value).replace(/[&<>"']/g, (c) => ({
 }[c]));
 
 const wpUrl = (x) => `https://sub.itfinancelab.com/저장소/${x.wp}`;
+// 조건 요약 페이지가 있는 제도는 비교표와 목록 데이터에서 그 페이지로 보낸다. 카드는 계속 워드프레스 글로 간다.
+const detailOf = (x) => DETAILS.find((d) => d.wp === x.wp);
+const detailPath = (d) => `/${d.category}/${d.slug}/`;
+const infoUrl = (x) => (detailOf(x) ? `${SITE}${detailPath(detailOf(x))}` : wpUrl(x));
 const pageUrl = (c) => (c.slug ? `${SITE}/${c.slug}/` : `${SITE}/`);
 
 const tagClassOf = (category) => category === '가족' ? 'family'
@@ -116,12 +121,12 @@ const filtersOf = (current) => CATEGORIES.map((c) => {
 // 카드에서 지운 요약을 표로 다시 보여준다. 크롤러가 읽을 본문이 되고, 제도끼리 비교하기도 쉽다.
 const compareOf = (category, list) => {
   const heading = category.slug ? `${category.label} 제도 한눈에 비교` : '전체 제도 한눈에 비교';
-  const rows = list.map((x) => `<tr><th scope="row"><a href="${wpUrl(x)}">${esc(x.name)}</a>`
+  const rows = list.map((x) => `<tr><th scope="row"><a href="${detailOf(x) ? detailPath(detailOf(x)) : wpUrl(x)}">${esc(x.name)}</a>`
     + `${x.status ? `<span class="row-note">${esc(x.status)}</span>` : ''}</th>`
     + `<td>${esc(x.benefit)}</td><td>${esc(x.summary)}</td></tr>`).join('');
   return '<section class="compare" aria-labelledby="compare-title">'
     + `<h2 id="compare-title">${esc(heading)}</h2>`
-    + `<p class="compare-desc">${list.length}개 제도의 혜택과 확인할 점입니다. 제도 이름을 누르면 조건과 신청 방법을 정리한 글로 이동합니다.</p>`
+    + `<p class="compare-desc">${list.length}개 제도의 혜택과 확인할 점입니다. 제도 이름을 누르면 조건을 정리한 페이지나 신청 방법 글로 이동합니다.</p>`
     + '<div class="table-wrap"><table><thead><tr><th scope="col">제도</th><th scope="col">혜택</th>'
     + `<th scope="col">확인할 점</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
 };
@@ -134,7 +139,7 @@ const jsonLdOf = (category, list) => {
       description: category.desc, inLanguage: 'ko-KR', isPartOf: { '@id': `${SITE}/#website` },
       mainEntity: { '@id': `${url}#list` } },
     { '@type': 'ItemList', '@id': `${url}#list`, numberOfItems: list.length,
-      itemListElement: list.map((x, i) => ({ '@type': 'ListItem', position: i + 1, name: x.name, url: wpUrl(x) })) },
+      itemListElement: list.map((x, i) => ({ '@type': 'ListItem', position: i + 1, name: x.name, url: infoUrl(x) })) },
   ];
   if (category.slug) {
     graph.push({ '@type': 'BreadcrumbList', itemListElement: [
@@ -195,9 +200,133 @@ for (const category of CATEGORIES) {
   made += 1;
 }
 
+// ── 제도별 조건 요약 페이지 ─────────────────────────────────────────────
+const AD_CLIENT = 'ca-pub-8832347985556850';
+const korDate = (iso) => { const [y, m, d] = iso.split('-').map(Number); return `${y}년 ${m}월 ${d}일`; };
+const FOOTER = '<footer><span>지원금 모음</span><nav class="footer-nav" aria-label="분야별 지원금">'
+  + '<a href="/youth/">청년 지원금</a><a href="/senior/">40·50·60대 지원금</a><a href="/family/">가족·육아 지원금</a>'
+  + '<a href="/job/">일자리 지원금</a><a href="/life/">생활·의료 지원금</a><a href="/finance/">정책대출·환급</a>'
+  + '<a href="/about/">운영 안내</a></nav></footer>';
+
+const detailHtml = (d) => {
+  const cat = CATEGORIES.find((c) => c.slug === d.category);
+  const url = `${SITE}${detailPath(d)}`;
+  const related = DETAILS.filter((o) => o.category === d.category && o.slug !== d.slug);
+  const ld = JSON.stringify({ '@context': 'https://schema.org', '@graph': [
+    { '@type': 'WebPage', '@id': `${url}#page`, url, name: d.title, description: d.desc, inLanguage: 'ko-KR',
+      dateModified: d.checked, isPartOf: { '@id': `${SITE}/#website` } },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE}/` },
+      { '@type': 'ListItem', position: 2, name: cat.label, item: pageUrl(cat) },
+      { '@type': 'ListItem', position: 3, name: d.name, item: url },
+    ] },
+  ] }).replace(/</g, '\\u003c');
+
+  return `<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="${esc(d.desc)}">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="google-adsense-account" content="${AD_CLIENT}">
+  <link rel="canonical" href="${url}">
+  <meta property="og:type" content="article">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:site_name" content="${SITE_NAME}">
+  <meta property="og:url" content="${url}">
+  <meta property="og:title" content="${esc(d.title)}">
+  <meta property="og:description" content="${esc(d.desc)}">
+  <meta property="og:image" content="${SITE}/og-benefit-v2.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#f7f7f2">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CLIENT}" crossorigin="anonymous"></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EZWW0615H1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-EZWW0615H1');
+  </script>
+  <title>${esc(d.title)}</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="alternate" type="application/rss+xml" title="${SITE_NAME}" href="${SITE}/rss.xml">
+  <script type="application/ld+json">${ld}</script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/" aria-label="지원금 모음 홈"><span class="logo-mark" aria-hidden="true">₩</span><span>지원금 모음</span></a>
+    <span class="header-note">지원 제도 안내</span>
+  </header>
+  <main class="detail">
+    <nav class="crumbs" aria-label="현재 위치"><a href="/">지원금 모음</a> › <a href="/${cat.slug}/">${esc(cat.label)}</a> › <span>${esc(d.name)}</span></nav>
+    <h1>${esc(d.name)} 조건 한눈에 보기</h1>
+    <p class="checked">정보 확인: ${korDate(d.checked)} · 공식 자료 기준</p>
+    <p class="status status-${d.status.tone}">${esc(d.status.text)}</p>
+    <p class="detail-lead">${esc(d.lead)}</p>
+
+    <section aria-labelledby="facts-title">
+      <h2 id="facts-title">핵심 조건</h2>
+      <div class="table-wrap"><table class="facts"><tbody>
+        ${d.rows.map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`).join('\n        ')}
+      </tbody></table></div>
+    </section>
+
+    <aside class="ad-slot" aria-label="광고"><ins class="adsbygoogle" style="display:block" data-ad-client="${AD_CLIENT}" data-ad-slot="3755490673" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></aside>
+
+    <section aria-labelledby="check-title">
+      <h2 id="check-title">나도 받을 수 있을까? 체크해 보기</h2>
+      <ul class="checklist">
+        ${d.checks.map((c) => `<li>${esc(c)}</li>`).join('\n        ')}
+      </ul>
+      <p class="hint">모두 해당하면 신청 대상일 가능성이 높습니다. 최종 대상 여부는 신청 기관의 심사로 정해집니다.</p>
+    </section>
+
+    <section aria-labelledby="faq-title">
+      <h2 id="faq-title">자주 헷갈리는 점</h2>
+      ${d.notes.map(([q, a]) => `<div class="qa"><h3>${esc(q)}</h3><p>${esc(a)}</p></div>`).join('\n      ')}
+    </section>
+
+    <div class="detail-actions">
+      <a class="detail-cta" href="${wpUrl(d)}" data-benefit="${esc(d.name)}">자세한 신청 방법 보기 <span aria-hidden="true">→</span></a>
+      ${d.official ? `<a class="detail-official" href="${d.official.url}" target="_blank" rel="noopener" data-benefit="${esc(d.name)}">${esc(d.official.label)} ↗</a>` : ''}
+    </div>
+
+    <section aria-labelledby="src-title">
+      <h2 id="src-title">공식 출처</h2>
+      <ul class="sources">
+        ${d.sources.map(([label, href]) => `<li><a href="${href}" target="_blank" rel="noopener">${esc(label)}</a></li>`).join('\n        ')}
+      </ul>
+      <p class="hint">지원 내용은 해마다 바뀝니다. 신청 전에 해당 연도 공고를 꼭 확인하세요.</p>
+    </section>
+${related.length ? `
+    <section aria-labelledby="rel-title">
+      <h2 id="rel-title">${esc(cat.label)} 다른 제도</h2>
+      <ul class="related">
+        ${related.map((o) => `<li><a href="${detailPath(o)}">${esc(o.name)}</a><span>${esc((items.find((x) => x.wp === o.wp) || {}).benefit || '')}</span></li>`).join('\n        ')}
+      </ul>
+      <p class="hint"><a href="/${cat.slug}/">${esc(cat.label)} 제도 전체 보기 →</a></p>
+    </section>
+` : ''}  </main>
+  ${FOOTER}
+  <script src="/script.js" defer></script>
+</body>
+</html>
+`;
+};
+
+for (const d of DETAILS) {
+  if (!items.some((x) => x.wp === d.wp)) throw new Error(`details.mjs의 ${d.name}(wp ${d.wp})가 script.js items에 없습니다.`);
+  mkdirSync(`public${detailPath(d)}`, { recursive: true });
+  writeFileSync(`public${detailPath(d)}index.html`, detailHtml(d));
+}
+
 const today = new Date().toISOString().slice(0, 10);
 const pages = [
   ...CATEGORIES.map((c) => ({ url: pageUrl(c), title: c.title, desc: c.desc, priority: c.slug ? '0.8' : '1.0' })),
+  ...DETAILS.map((d) => ({ url: `${SITE}${detailPath(d)}`, title: d.title, desc: d.desc, priority: '0.7' })),
   ...EXTRA_PAGES.map((p) => ({ url: `${SITE}${p.path}`, title: p.title, desc: p.desc, priority: '0.3' })),
 ];
 
@@ -221,4 +350,4 @@ const rss = '<?xml version="1.0" encoding="UTF-8"?>\n'
   + '\n</channel>\n</rss>\n';
 writeFileSync('public/rss.xml', rss);
 
-console.log(`페이지 ${made}개, sitemap·RSS ${pages.length}개 주소 생성`);
+console.log(`분야 페이지 ${made}개, 조건 요약 페이지 ${DETAILS.length}개, sitemap·RSS ${pages.length}개 주소 생성`);

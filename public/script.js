@@ -33,8 +33,8 @@ const items = [
   {name:'청년도전지원사업',category:'일자리',benefit:'참여수당 최대 350만 원',summary:'구직을 중단한 청년의 사회 복귀와 취업을 돕는 사업입니다.',wp:2206,terms:'청년 구직 니트 참여수당'},
   {name:'청년내일채움공제',category:'일자리',benefit:'만기 시 최대 1,200만 원',summary:'중소기업 취업 청년의 자산 형성을 돕는 공제입니다.',wp:2208,terms:'청년 중소기업 공제 목돈 적립'},
   {name:'청년문화예술패스',category:'생활·의료',benefit:'공연·전시 관람비 지원',summary:'청년의 문화예술 관람을 지원합니다. 대상 연령과 사용처를 확인하세요.',wp:2210,terms:'청년 공연 전시 문화 관람'},
-  {name:'청년형 ISA',category:'청년·주거',benefit:'비과세 혜택 최대 400만 원',summary:'청년 대상 개인종합자산관리계좌입니다. 소득 요건을 확인하세요.',wp:2212,terms:'청년 절세 계좌 비과세 투자'},
-  {name:'청년도약계좌',category:'청년·주거',benefit:'만기 목돈 최대 5,000만 원',summary:'청년의 중장기 자산 형성을 돕는 계좌입니다. 소득 구간별 기여금이 다릅니다.',wp:2218,terms:'청년 적금 자산 목돈 기여금'},
+  {name:'청년형 ISA',category:'청년·주거',benefit:'이자·배당 비과세 + 납입액 10% 소득공제 추진',summary:'2026년 세제개편안에 담긴 신설안으로, 국회를 통과해야 시행됩니다. 아직 가입할 수 없습니다.',wp:2212,terms:'청년 절세 계좌 비과세 투자'},
+  {name:'청년도약계좌',category:'청년·주거',benefit:'신규 가입 종료 · 기존 가입자는 만기까지 유지',summary:'2025년 말 신규 가입이 끝났습니다. 기존 가입자는 청년미래적금으로 갈아탈 수 있는지도 확인하세요.',wp:2218,terms:'청년 적금 자산 목돈 기여금'},
   {name:'전기차 보조금',category:'생활·의료',benefit:'최대 680만 원',summary:'전기차 구매 시 국비와 지방비를 함께 지원합니다. 지자체별로 금액이 다릅니다.',wp:2214,terms:'전기차 구매 보조금 자동차 친환경'},
   {name:'중증장애인 신규고용장려금',category:'일자리',benefit:'연 최대 1,080만 원',summary:'중증장애인을 새로 고용한 사업주를 지원합니다.',wp:2216,terms:'장애인 고용 사업주 장려금',status:'사업주 대상'},
   {name:'긴급복지 생계지원',category:'생활·의료',benefit:'최대 330만 원',summary:'갑작스러운 위기로 생계가 어려워진 가구를 지원합니다.',wp:2220,terms:'위기 생계 긴급 지원 실직 질병'},
@@ -51,6 +51,17 @@ document.addEventListener('click', event => {
     benefit_name: link.querySelector('h3').textContent.trim(),
     benefit_category: link.querySelector('.tag').textContent.trim(),
     wp_url: link.href,
+  });
+});
+
+// 조건 요약 페이지에서 신청 방법 글·공식 사이트로 넘어가는 클릭을 본다.
+document.addEventListener('click', event => {
+  const link = event.target.closest('a.detail-cta, a.detail-official');
+  if (!link || typeof gtag !== 'function') return;
+  gtag('event', 'detail_click', {
+    benefit_name: link.dataset.benefit,
+    link_type: link.classList.contains('detail-cta') ? 'wp' : 'official',
+    link_url: link.href,
   });
 });
 

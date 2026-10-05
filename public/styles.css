@@ -226,3 +226,50 @@
   .about h1 { font-size: 30px; }
   .about section { padding: 20px; }
 }
+
+/* 제도별 조건 요약 페이지 */
+.detail { max-width: 820px; padding: 4px 36px 48px; color: #33463f; line-height: 1.8; word-break: keep-all; }
+.crumbs { font-size: 13px; color: #7a8a82; margin: 8px 0 18px; }
+.crumbs a { color: #4b6a5e; text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+.detail h1 { font-size: clamp(28px, 4vw, 40px); letter-spacing: -.06em; line-height: 1.3; color: #173d34; margin: 0 0 8px; }
+.checked { font-size: 13px; color: #7d8b84; margin: 0 0 18px; }
+.status { margin: 0 0 18px; padding: 14px 18px; border-radius: 14px; font-size: 15px; font-weight: 700; line-height: 1.6; }
+.status-open { background: #e7f1fe; color: #0757b7; }
+.status-closed { background: #fff3e6; color: #9a5a1c; }
+.status-plan { background: #f1e9ff; color: #5d3c96; }
+.detail-lead { font-size: 17px; color: #2d433b; margin: 0 0 32px; }
+.detail section { margin: 0 0 36px; }
+.detail h2 { font-size: 22px; letter-spacing: -.05em; color: #173d34; margin: 0 0 12px; }
+.facts { width: 100%; border-collapse: collapse; font-size: 15px; }
+.facts th, .facts td { padding: 14px 18px; text-align: left; vertical-align: top; border-bottom: 1px solid #eef1ea; }
+.facts tr:last-child th, .facts tr:last-child td { border-bottom: 0; }
+.facts th { width: 30%; background: #f6f8f4; color: #3f564c; font-weight: 800; }
+.checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.checklist li { background: #fff; border: 1px solid #e4e9e1; border-radius: 12px; padding: 12px 16px 12px 44px; position: relative; font-size: 15px; }
+.checklist li::before { content: ''; position: absolute; left: 16px; top: 15px; width: 16px; height: 16px; border: 2px solid #438f72; border-radius: 4px; }
+.hint { font-size: 13px; color: #74827b; margin: 10px 0 0; }
+.hint a { color: #0757b7; text-decoration: none; }
+.qa { background: #fff; border: 1px solid #e4e9e1; border-radius: 14px; padding: 18px 20px; margin-bottom: 10px; }
+.qa h3 { font-size: 16px; margin: 0 0 6px; color: #1c302c; letter-spacing: -.03em; }
+.qa p { margin: 0; font-size: 15px; color: #4d5f57; }
+.detail-actions { display: grid; gap: 10px; margin: 8px 0 40px; }
+.detail-cta, .detail-official { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; border-radius: 14px; font-size: 16px; font-weight: 800; text-decoration: none; }
+.detail-cta { background: #0969da; color: #fff; box-shadow: 0 7px 18px rgba(9,105,218,.26); }
+.detail-cta:hover { background: #0757b7; }
+.detail-official { background: #fff; color: #174e44; border: 1px solid #cfdccf; }
+.detail-official:hover { background: #f1f6f0; }
+.sources { margin: 0; padding-left: 20px; font-size: 14px; }
+.sources li + li { margin-top: 6px; }
+.sources a { color: #0757b7; }
+.related { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.related li { background: #fff; border: 1px solid #e4e9e1; border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.related a { color: #0757b7; font-weight: 800; text-decoration: none; }
+.related span { font-size: 13px; color: #61746a; }
+@media (max-width: 600px) {
+  .detail { padding: 0 16px 32px; }
+  .detail-lead { font-size: 16px; }
+  .facts { font-size: 14px; }
+  .facts th, .facts td { padding: 12px; }
+  .facts th { width: 34%; }
+}

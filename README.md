@@ -19,6 +19,8 @@ Threads에서 방문한 독자가 지원 제도를 찾아보고, 각 카드에�
 
 빌드는 분야별 H1·소개 문단·제도 비교표·구조화 데이터(JSON-LD)와 `sitemap.xml`·`rss.xml`을 함께 만듭니다. 분야 소개 문구는 `tools/build-cards.mjs`의 `CATEGORIES`에서 고칩니다. 광고 간격은 같은 파일의 `AD_EVERY`(현재 카드 6개마다)입니다.
 
+청년 분야 5개 제도는 조건 요약 페이지(`/youth/{slug}/`)가 있습니다. 데이터는 `tools/details.mjs`이며 공식 자료에서 확인한 내용만 넣고 `checked` 날짜를 함께 고칩니다. 카드는 계속 워드프레스 글로 가고, 비교표의 제도 이름만 요약 페이지로 갑니다.
+
 배포가 끝나면 CI가 `node tools/indexnow.mjs`로 사이트맵 주소를 네이버·빙에 IndexNow로 알립니다. 키 파일은 `public/{32자리 키}.txt`이며 지우면 통보가 실패합니다. 구글은 IndexNow를 받지 않으므로 서치콘솔에서 따로 제출합니다.
 
 ## 후속 제작 목록
