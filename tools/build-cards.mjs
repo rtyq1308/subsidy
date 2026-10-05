@@ -18,43 +18,52 @@ import { DETAILS } from './details.mjs';
 
 const SITE = 'https://subsidy.itfinancelab.com';
 const SITE_NAME = '지원금 모음';
+// 운영 주체. 전체 노드는 홈과 운영 안내에만 싣고 다른 페이지는 @id 로 참조한다 (같은 엔티티가 페이지마다 갈라지지 않게).
+const ORG_ID = `${SITE}/#organization`;
+const ORG = {
+  '@type': 'Organization', '@id': ORG_ID, name: SITE_NAME, url: `${SITE}/`, email: 'rtyq1308@gmail.com',
+  logo: `${SITE}/og-benefit-v2.png`,
+  sameAs: ['https://www.threads.com/@jiwongeum_moeum', 'https://www.instagram.com/jiwongeum_moeum/'],
+};
+const WEBSITE = { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`, name: SITE_NAME, inLanguage: 'ko-KR',
+  publisher: { '@id': ORG_ID } };
 // 카드 6개마다 광고 1개. 3개마다 넣던 때는 홈에 광고가 14개라 본문보다 광고가 많아 보였다.
 const AD_EVERY = 6;
 
 const CATEGORIES = [
   { slug: '', name: '전체', label: '전체',
     title: '지원금 모음 | 나에게 맞는 정부지원금 찾기',
-    desc: '지원금 모음에서 청년·중장년·가족 지원금과 정책대출·환급 정보를 한눈에 확인하세요.',
+    desc: '청년월세·청년미래적금·기초연금·실업급여·부모급여 등 정부 지원 제도 40개의 대상과 혜택을 분야별로 비교하고, 조건과 신청 방법을 공식 자료 기준으로 확인하세요.',
     h1: '지원금 모음,<br><em>나에게 맞는 혜택 찾기.</em>',
     intro: '청년·중장년·가족·생활·일자리 지원을 한곳에 모았습니다. 조건을 먼저 읽고, 필요한 제도의 상세 안내로 이동하세요.' },
   { slug: 'finance', name: '대출·환급', label: '대출·환급',
     title: '정책대출·환급 모음 | 보금자리론·디딤돌·버팀목',
-    desc: '보금자리론, 디딤돌대출, 청년전용 버팀목전세자금, 소상공인 정책자금과 세금 경정청구를 확인하세요.',
+    desc: '보금자리론·디딤돌대출·청년전용 버팀목전세자금 같은 주택 정책대출과 소상공인 정책자금, 종합소득세 경정청구의 대상과 조건을 한눈에 비교하세요.',
     h1: '정책대출·세금 환급,<br><em>조건부터 확인하기.</em>',
     intro: '보금자리론·디딤돌대출·청년전용 버팀목전세자금 같은 주택 정책대출과 소상공인 정책자금, 종합소득세 경정청구를 모았습니다. 정책대출은 소득·주택가격·무주택 여부에 따라 한도와 금리가 달라지니 제도별 조건을 먼저 비교하세요.' },
   { slug: 'senior', name: '중장년', label: '40·50·60대',
     title: '40·50·60대 지원금 모음 | 실업급여·연금·일자리',
-    desc: '40대 이후 받을 수 있는 실업급여, 국민연금, 주택연금, 노인일자리 등 중장년 지원 제도를 정리했습니다.',
+    desc: '40·50·60대가 받을 수 있는 실업급여(1일 최대 68,100원), 국민연금 실업크레딧, 주택연금, 노인일자리 등 중장년 지원 제도의 대상과 혜택을 비교하세요.',
     h1: '40·50·60대 지원금,<br><em>퇴직 전후로 챙기기.</em>',
     intro: '실업급여, 국민연금 실업크레딧, 주택연금, 노인일자리, 중장년내일센터처럼 퇴직·재취업·노후 준비에 필요한 제도를 모았습니다. 나이 기준과 고용보험 가입 이력에 따라 받을 수 있는 제도가 다르고, 사업주가 신청하는 제도는 카드에 따로 표시했습니다.' },
   { slug: 'youth', name: '청년·주거', label: '청년·주거',
     title: '청년 지원금 모음 | 월세·적금·주거 지원',
-    desc: '청년월세 지원, 청년미래적금, 청년내일저축계좌 등 청년 대상 지원 제도를 정리했습니다.',
+    desc: '청년월세 지원(월 최대 20만 원), 청년미래적금, 청년내일저축계좌, 청년도약계좌 갈아타기까지 청년 지원 제도의 조건과 일정을 공식 자료 기준으로 정리했습니다.',
     h1: '청년 지원금,<br><em>월세·적금 한 번에.</em>',
     intro: '청년월세 지원, 청년내일저축계좌, 청년미래적금, 청년도약계좌, 청년형 ISA처럼 청년의 주거비와 목돈 마련을 돕는 제도를 모았습니다. 대부분 나이와 본인·가구 소득 기준이 있으니, 비슷한 적금 상품끼리 함께 가입할 수 있는지도 같이 확인하세요.' },
   { slug: 'job', name: '일자리', label: '일자리',
     title: '일자리 지원금 모음 | 구직·훈련 지원',
-    desc: '국민취업지원제도, 국민내일배움카드 등 구직과 직업훈련 지원 제도를 정리했습니다.',
+    desc: '국민취업지원제도(최대 360만 원), 국민내일배움카드, 청년도전지원사업, 청년내일채움공제 등 구직·직업훈련 지원 제도의 대상과 혜택을 비교하세요.',
     h1: '일자리 지원금,<br><em>구직·훈련·취업 수당.</em>',
     intro: '국민취업지원제도, 취업성공수당, 국민내일배움카드, 청년도전지원사업, 청년내일채움공제처럼 구직과 직업훈련을 돕는 제도를 모았습니다. 구직자가 신청하는 제도와 사업주가 신청하는 고용장려금이 섞여 있으니 카드의 대상 표시를 확인하세요.' },
   { slug: 'family', name: '가족', label: '가족',
     title: '가족·육아 지원금 모음 | 부모급여·장려금',
-    desc: '부모급여, 첫만남이용권, 자녀장려금 등 가족과 육아 지원 제도를 정리했습니다.',
+    desc: '부모급여(0세 월 최대 100만 원), 첫만남이용권, 자녀장려금, 양육비 선지급 등 출산·육아 지원 제도의 대상과 지급액을 한눈에 비교하세요.',
     h1: '가족·육아 지원금,<br><em>출산부터 양육까지.</em>',
     intro: '부모급여, 첫만남이용권, 자녀장려금, 양육비 선지급처럼 출산과 양육 단계별로 받을 수 있는 제도를 모았습니다. 아이 나이와 가구 소득에 따라 지급액과 신청 시기가 다르니 제도별 조건을 확인하세요.' },
   { slug: 'life', name: '생활·의료', label: '생활·의료',
     title: '생활·의료 지원금 모음 | 의료비·주거급여',
-    desc: '근로장려금, 주거급여, 기초연금, 재난적의료비 등 생활과 의료 지원 제도를 정리했습니다.',
+    desc: '근로장려금, 기초연금, 주거급여, 재난적의료비, K-패스, 에너지바우처 등 생활비·의료비를 덜어주는 지원 제도의 대상과 혜택을 한눈에 비교하세요.',
     h1: '생활·의료 지원금,<br><em>병원비·교통비·생계비.</em>',
     intro: '근로장려금, 기초연금, 주거급여, 재난적의료비, 본인부담상한제, K-패스, 에너지바우처, 긴급복지 생계지원처럼 생활비와 의료비 부담을 덜어주는 제도를 모았습니다. 소득·재산 기준이 있는 제도가 많으니 조건을 먼저 확인하세요.' },
 ];
@@ -134,7 +143,8 @@ const compareOf = (category, list) => {
 const jsonLdOf = (category, list) => {
   const url = pageUrl(category);
   const graph = [
-    { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`, name: SITE_NAME, inLanguage: 'ko-KR' },
+    WEBSITE,
+    ...(category.slug ? [] : [ORG]),
     { '@type': 'CollectionPage', '@id': `${url}#page`, url, name: category.title,
       description: category.desc, inLanguage: 'ko-KR', isPartOf: { '@id': `${SITE}/#website` },
       mainEntity: { '@id': `${url}#list` } },
@@ -213,6 +223,7 @@ const detailHtml = (d) => {
   const url = `${SITE}${detailPath(d)}`;
   const related = DETAILS.filter((o) => o.category === d.category && o.slug !== d.slug);
   const ld = JSON.stringify({ '@context': 'https://schema.org', '@graph': [
+    WEBSITE,
     { '@type': 'WebPage', '@id': `${url}#page`, url, name: d.title, description: d.desc, inLanguage: 'ko-KR',
       dateModified: d.checked, isPartOf: { '@id': `${SITE}/#website` } },
     { '@type': 'BreadcrumbList', itemListElement: [
@@ -220,6 +231,8 @@ const detailHtml = (d) => {
       { '@type': 'ListItem', position: 2, name: cat.label, item: pageUrl(cat) },
       { '@type': 'ListItem', position: 3, name: d.name, item: url },
     ] },
+    { '@type': 'FAQPage', '@id': `${url}#faq`, mainEntity: d.notes.map(([q, a]) => ({
+      '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) },
   ] }).replace(/</g, '\\u003c');
 
   return `<!doctype html>
@@ -336,6 +349,21 @@ const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
     + `    <changefreq>weekly</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`).join('\n')
   + '\n</urlset>\n';
 writeFileSync('public/sitemap.xml', sitemap);
+
+// AI 검색·답변 엔진용 안내서 (GEO). 페이지 목록과 데이터 정책을 사이트맵과 같은 원본에서 만든다.
+const llms = [
+  `# ${SITE_NAME}`, '',
+  '> 청년·중장년·가족·일자리·생활·정책대출 분야 정부 지원 제도의 대상·혜택·신청 일정을 공식 자료 기준으로 정리한 안내 사이트입니다. 신청 접수나 자격 판정은 하지 않습니다.', '',
+  '## 제도별 조건 요약', '',
+  ...DETAILS.map((d) => `- [${d.name} 조건 한눈에 보기](${SITE}${detailPath(d)}): ${d.desc} (정보 확인 ${d.checked})`), '',
+  '## 분야별 지원금 모음', '',
+  ...CATEGORIES.map((c) => `- [${c.title.split(' | ')[0]}](${pageUrl(c)}): ${c.desc}`), '',
+  '## 데이터 정책', '',
+  '- 출처: 정책브리핑(korea.kr), 복지로, 정부24, 금융위원회 등 소관 부처·기관 공고. 각 조건 요약 페이지에 출처 링크와 확인 날짜를 적는다.',
+  '- 지원 제도는 해마다 바뀐다. 새 공고가 나오면 다시 확인해 고친다.',
+  `- 운영 안내: ${SITE}/about/ · 문의: rtyq1308@gmail.com`, '',
+].join('\n');
+writeFileSync('public/llms.txt', llms);
 
 // 네이버 서치어드바이저는 RSS로 새 문서를 더 빨리 가져간다.
 const pubDate = new Date(`${today}T00:00:00+09:00`).toUTCString();

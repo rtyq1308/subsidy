@@ -1,4 +1,41 @@
+# 검색·AI 답변 인용이 목표라 검색엔진과 AI 검색·실시간 열람 크롤러를 모두 허용한다 (2026-10-05).
 User-agent: *
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://subsidy.itfinancelab.com/sitemap.xml
