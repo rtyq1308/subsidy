@@ -30,8 +30,8 @@ const WEBSITE = { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`
 // 카드 6개마다 광고 1개. 3개마다 넣던 때는 홈에 광고가 14개라 본문보다 광고가 많아 보였다.
 const AD_EVERY = 6;
 // 2026-10-29: 페이지별 발행일과 목록 갱신일. 카드(제도) 내용을 바꾸면 LIST_UPDATED·LIST_UPDATED_KO 도 같이 바꾼다.
-const LIST_UPDATED = '2026-10-05';
-const LIST_UPDATED_KO = '2026년 10월 5일';
+const LIST_UPDATED = '2026-10-29';
+const LIST_UPDATED_KO = '2026년 10월 29일';
 const PUBLISHED = { '': '2026-09-21', youth: '2026-09-22', senior: '2026-09-22', job: '2026-09-22',
   family: '2026-09-22', life: '2026-09-22', finance: '2026-09-28' };
 const ABOUT_UPDATED = '2026-10-05';
