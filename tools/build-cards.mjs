@@ -29,6 +29,13 @@ const WEBSITE = { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`
   publisher: { '@id': ORG_ID } };
 // 카드 6개마다 광고 1개. 3개마다 넣던 때는 홈에 광고가 14개라 본문보다 광고가 많아 보였다.
 const AD_EVERY = 6;
+// 2026-10-29: 페이지별 발행일과 목록 갱신일. 카드(제도) 내용을 바꾸면 LIST_UPDATED·LIST_UPDATED_KO 도 같이 바꾼다.
+const LIST_UPDATED = '2026-10-05';
+const LIST_UPDATED_KO = '2026년 10월 5일';
+const PUBLISHED = { '': '2026-09-21', youth: '2026-09-22', senior: '2026-09-22', job: '2026-09-22',
+  family: '2026-09-22', life: '2026-09-22', finance: '2026-09-28' };
+const ABOUT_UPDATED = '2026-10-05';
+const DETAIL_PUBLISHED = '2026-10-05';  // 청년 5개 조건 요약 페이지 첫 발행
 
 const CATEGORIES = [
   { slug: '', name: '전체', label: '전체',
@@ -135,7 +142,7 @@ const compareOf = (category, list) => {
     + `<td>${esc(x.benefit)}</td><td>${esc(x.summary)}</td></tr>`).join('');
   return '<section class="compare" aria-labelledby="compare-title">'
     + `<h2 id="compare-title">${esc(heading)}</h2>`
-    + `<p class="compare-desc">${list.length}개 제도의 혜택과 확인할 점입니다. 제도 이름을 누르면 조건을 정리한 페이지나 신청 방법 글로 이동합니다.</p>`
+    + `<p class="compare-desc">${list.length}개 제도의 혜택과 확인할 점입니다. 제도 이름을 누르면 조건을 정리한 페이지나 신청 방법 글로 이동합니다. (목록 갱신 ${LIST_UPDATED_KO})</p>`
     + '<div class="table-wrap"><table><thead><tr><th scope="col">제도</th><th scope="col">혜택</th>'
     + `<th scope="col">확인할 점</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
 };
@@ -147,6 +154,7 @@ const jsonLdOf = (category, list) => {
     ...(category.slug ? [] : [ORG]),
     { '@type': 'CollectionPage', '@id': `${url}#page`, url, name: category.title,
       description: category.desc, inLanguage: 'ko-KR', isPartOf: { '@id': `${SITE}/#website` },
+      datePublished: PUBLISHED[category.slug] || LIST_UPDATED, dateModified: LIST_UPDATED,
       mainEntity: { '@id': `${url}#list` } },
     { '@type': 'ItemList', '@id': `${url}#list`, numberOfItems: list.length,
       itemListElement: list.map((x, i) => ({ '@type': 'ListItem', position: i + 1, name: x.name, url: infoUrl(x) })) },
@@ -225,7 +233,7 @@ const detailHtml = (d) => {
   const ld = JSON.stringify({ '@context': 'https://schema.org', '@graph': [
     WEBSITE,
     { '@type': 'WebPage', '@id': `${url}#page`, url, name: d.title, description: d.desc, inLanguage: 'ko-KR',
-      dateModified: d.checked, isPartOf: { '@id': `${SITE}/#website` } },
+      datePublished: d.published || DETAIL_PUBLISHED, dateModified: d.checked, isPartOf: { '@id': `${SITE}/#website` } },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE}/` },
       { '@type': 'ListItem', position: 2, name: cat.label, item: pageUrl(cat) },
@@ -276,9 +284,9 @@ const detailHtml = (d) => {
   <main class="detail">
     <nav class="crumbs" aria-label="현재 위치"><a href="/">지원금 모음</a> › <a href="/${cat.slug}/">${esc(cat.label)}</a> › <span>${esc(d.name)}</span></nav>
     <h1>${esc(d.name)} 조건 한눈에 보기</h1>
-    <p class="checked">정보 확인: ${korDate(d.checked)} · 공식 자료 기준</p>
-    <p class="status status-${d.status.tone}">${esc(d.status.text)}</p>
     <p class="detail-lead">${esc(d.lead)}</p>
+    <p class="status status-${d.status.tone}">${esc(d.status.text)}</p>
+    <p class="checked">정보 확인: ${korDate(d.checked)} · 공식 자료 기준</p>
 
     <section aria-labelledby="facts-title">
       <h2 id="facts-title">핵심 조건</h2>
@@ -337,15 +345,19 @@ for (const d of DETAILS) {
 }
 
 const today = new Date().toISOString().slice(0, 10);
+// lastmod·pubDate 는 빌드한 날이 아니라 실제 갱신일·발행일 (2026-10-29 전에는 모든 주소가 배포일이었다)
 const pages = [
-  ...CATEGORIES.map((c) => ({ url: pageUrl(c), title: c.title, desc: c.desc, priority: c.slug ? '0.8' : '1.0' })),
-  ...DETAILS.map((d) => ({ url: `${SITE}${detailPath(d)}`, title: d.title, desc: d.desc, priority: '0.7' })),
-  ...EXTRA_PAGES.map((p) => ({ url: `${SITE}${p.path}`, title: p.title, desc: p.desc, priority: '0.3' })),
+  ...CATEGORIES.map((c) => ({ url: pageUrl(c), title: c.title, desc: c.desc, priority: c.slug ? '0.8' : '1.0',
+    lastmod: LIST_UPDATED, published: PUBLISHED[c.slug] || LIST_UPDATED })),
+  ...DETAILS.map((d) => ({ url: `${SITE}${detailPath(d)}`, title: d.title, desc: d.desc, priority: '0.7',
+    lastmod: d.checked, published: d.published || DETAIL_PUBLISHED })),
+  ...EXTRA_PAGES.map((p) => ({ url: `${SITE}${p.path}`, title: p.title, desc: p.desc, priority: '0.3',
+    lastmod: ABOUT_UPDATED, published: ABOUT_UPDATED })),
 ];
 
 const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
   + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-  + pages.map((p) => `  <url>\n    <loc>${p.url}</loc>\n    <lastmod>${today}</lastmod>\n`
+  + pages.map((p) => `  <url>\n    <loc>${p.url}</loc>\n    <lastmod>${p.lastmod}</lastmod>\n`
     + `    <changefreq>weekly</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`).join('\n')
   + '\n</urlset>\n';
 writeFileSync('public/sitemap.xml', sitemap);
@@ -362,11 +374,29 @@ const llms = [
   '- 출처: 정책브리핑(korea.kr), 복지로, 정부24, 금융위원회 등 소관 부처·기관 공고. 각 조건 요약 페이지에 출처 링크와 확인 날짜를 적는다.',
   '- 지원 제도는 해마다 바뀐다. 새 공고가 나오면 다시 확인해 고친다.',
   `- 운영 안내: ${SITE}/about/ · 문의: rtyq1308@gmail.com`, '',
+  '## 전체 내용', '',
+  `- [llms-full.txt](${SITE}/llms-full.txt): 분야별 제도 비교표 전체와 조건 요약 페이지 본문`, '',
 ].join('\n');
 writeFileSync('public/llms.txt', llms);
 
+// llms-full.txt — 분야별 비교표와 조건 요약 페이지 본문을 한 파일로 (2026-10-29)
+const full = [
+  `# ${SITE_NAME} — 전체 내용`, '',
+  `> 정부 지원 제도 ${items.length}개의 대상·혜택과 조건 요약. 목록 갱신 ${LIST_UPDATED}. 신청 접수나 자격 판정은 하지 않으며, 신청 전 해당 연도 공고를 확인해야 한다.`, '',
+  ...CATEGORIES.filter((c) => c.slug).flatMap((c) => {
+    const list = items.filter((x) => x.category === c.name);
+    return [`## ${c.label} 지원 제도 (${list.length}개)`, `주소: ${pageUrl(c)}`, '', '| 제도 | 혜택 | 확인할 점 |', '|---|---|---|',
+      ...list.map((x) => `| [${x.name}](${infoUrl(x)}) | ${x.benefit} | ${x.summary} |`), ''];
+  }),
+  ...DETAILS.flatMap((d) => [`## ${d.name} 조건 요약 (정보 확인 ${d.checked})`, `주소: ${SITE}${detailPath(d)}`, '', d.lead, '',
+    ...d.rows.map(([k, v]) => `- ${k}: ${v}`), '', ...d.notes.flatMap(([q, a]) => [`Q. ${q}`, `A. ${a}`]), '',
+    '출처:', ...d.sources.map(([label, href]) => `- [${label}](${href})`), '']),
+].join('\n');
+writeFileSync('public/llms-full.txt', full);
+
 // 네이버 서치어드바이저는 RSS로 새 문서를 더 빨리 가져간다.
-const pubDate = new Date(`${today}T00:00:00+09:00`).toUTCString();
+const rfc822 = (day) => new Date(`${day}T00:00:00+09:00`).toUTCString();
+const pubDate = rfc822(pages.map((p) => p.lastmod).sort().at(-1));
 const rss = '<?xml version="1.0" encoding="UTF-8"?>\n'
   + '<rss version="2.0">\n<channel>\n'
   + `  <title>${SITE_NAME}</title>\n  <link>${SITE}/</link>\n`
@@ -374,7 +404,7 @@ const rss = '<?xml version="1.0" encoding="UTF-8"?>\n'
   + `  <lastBuildDate>${pubDate}</lastBuildDate>\n`
   + pages.map((p) => `  <item>\n    <title>${esc(p.title)}</title>\n    <link>${p.url}</link>\n`
     + `    <guid isPermaLink="true">${p.url}</guid>\n    <description>${esc(p.desc)}</description>\n`
-    + `    <pubDate>${pubDate}</pubDate>\n  </item>`).join('\n')
+    + `    <pubDate>${rfc822(p.published)}</pubDate>\n  </item>`).join('\n')
   + '\n</channel>\n</rss>\n';
 writeFileSync('public/rss.xml', rss);
 

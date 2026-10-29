@@ -25,3 +25,7 @@
 - 출처: 정책브리핑(korea.kr), 복지로, 정부24, 금융위원회 등 소관 부처·기관 공고. 각 조건 요약 페이지에 출처 링크와 확인 날짜를 적는다.
 - 지원 제도는 해마다 바뀐다. 새 공고가 나오면 다시 확인해 고친다.
 - 운영 안내: https://subsidy.itfinancelab.com/about/ · 문의: rtyq1308@gmail.com
+
+## 전체 내용
+
+- [llms-full.txt](https://subsidy.itfinancelab.com/llms-full.txt): 분야별 제도 비교표 전체와 조건 요약 페이지 본문
