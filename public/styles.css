@@ -273,3 +273,4 @@
   .facts th, .facts td { padding: 12px; }
   .facts th { width: 34%; }
 }
+.card[hidden]{display:none}

@@ -84,3 +84,26 @@ if (finderBar && 'IntersectionObserver' in window) {
     {threshold: 1}
   ).observe(sentinel);
 }
+
+// 2026-11-11: 이름·혜택·관련어로 바로 찾기. 카드를 다시 그리지 않고 숨기기만 한다(그리드 광고 유지).
+const benefitSearch = document.querySelector('#benefit-search');
+if (benefitSearch) {
+  const cards = [...document.querySelectorAll('#cards a.card')];
+  const count = document.querySelector('#result-count');
+  const empty = document.querySelector('#empty');
+  const total = cards.length;
+  let timer = 0;
+  benefitSearch.addEventListener('input', () => {
+    const q = benefitSearch.value.replace(/\s+/g, '').toLowerCase();
+    let shown = 0;
+    cards.forEach(card => {
+      const ok = !q || (card.dataset.words || '').includes(q);
+      card.hidden = !ok;
+      if (ok) shown += 1;
+    });
+    if (count) count.textContent = q ? `${shown}개 찾음 (전체 ${total}개)` : `${total}개 제도`;
+    if (empty) empty.hidden = shown > 0;
+    clearTimeout(timer);
+    if (q && typeof gtag === 'function') timer = setTimeout(() => gtag('event', 'benefit_search', { search_term: q, results: shown }), 1200);
+  });
+}

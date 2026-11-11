@@ -30,8 +30,8 @@ const WEBSITE = { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`
 // 카드 6개마다 광고 1개. 3개마다 넣던 때는 홈에 광고가 14개라 본문보다 광고가 많아 보였다.
 const AD_EVERY = 6;
 // 2026-10-29: 페이지별 발행일과 목록 갱신일. 카드(제도) 내용을 바꾸면 LIST_UPDATED·LIST_UPDATED_KO 도 같이 바꾼다.
-const LIST_UPDATED = '2026-10-29';
-const LIST_UPDATED_KO = '2026년 10월 29일';
+const LIST_UPDATED = '2026-11-11';
+const LIST_UPDATED_KO = '2026년 11월 11일';
 const PUBLISHED = { '': '2026-09-21', youth: '2026-09-22', senior: '2026-09-22', job: '2026-09-22',
   family: '2026-09-22', life: '2026-09-22', finance: '2026-09-28' };
 const ABOUT_UPDATED = '2026-10-05';
@@ -114,7 +114,9 @@ const adUnit = () => '<aside class="ad-slot in-grid" aria-label="광고">'
 // 카드는 공식 신청 창구가 아니라 해설 글로 간다. 버튼 문구도 그에 맞춘다.
 const cardOf = (x) => {
   const cta = '<span class="cta">조건·신청 방법 보기 <span aria-hidden="true">→</span></span>';
-  return `<a class="card" href="${wpUrl(x)}" aria-label="${esc(x.name)} 조건·신청 방법 글 보기">`
+  // 2026-11-11: 이름·혜택·관련어로 바로 찾기(script.js)가 읽는 검색용 글자
+  const words = esc(`${x.name} ${x.category} ${x.benefit} ${x.terms || ''}`.replace(/\s+/g, '').toLowerCase());
+  return `<a class="card" data-words="${words}" href="${wpUrl(x)}" aria-label="${esc(x.name)} 조건·신청 방법 글 보기">`
     + `<div class="card-top"><span class="tag ${tagClassOf(x.category)}">${esc(x.category)}</span>`
     + `<span class="status">${esc(x.status || '조건 확인')}</span></div>`
     + `<h3>${esc(x.name)}</h3><p class="benefit">${esc(x.benefit)}</p>`
@@ -188,6 +190,13 @@ for (const category of CATEGORIES) {
     (_m, open, tail) => `${open}${gridOf(list)}${tail}`);
   html = html.replace(/(<p class="count" id="result-count">)[\s\S]*?(<\/p>)/,
     (_m, open, close) => `${open}${list.length}개 제도${close}`);
+  // 2026-11-11: 검색 칸 (없을 때만 넣는다 — 빌드를 여러 번 돌려도 하나)
+  if (!html.includes('id="benefit-search"')) {
+    html = html.replace('<div class="filters" id="filters"',
+      '<label class="search"><span class="search-icon" aria-hidden="true">⌕</span>'
+      + '<input id="benefit-search" type="search" placeholder="제도 이름이나 상황으로 찾기 (예: 월세, 실업, 육아)" autocomplete="off" aria-label="지원 제도 검색">'
+      + '</label><div class="filters" id="filters"');
+  }
   html = html.replace(/(<div class="filters" id="filters"[^>]*>)[\s\S]*?(<\/div>)/,
     (_m, open, close) => `${open}${filtersOf(category.name)}${close}`);
   html = html.replace(/(<h1 id="page-title">)[\s\S]*?(<\/h1>)/, (_m, open, close) => `${open}${category.h1}${close}`);
