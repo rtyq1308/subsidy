@@ -29,6 +29,19 @@ const WEBSITE = { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`
   publisher: { '@id': ORG_ID } };
 // 카드 6개마다 광고 1개. 3개마다 넣던 때는 홈에 광고가 14개라 본문보다 광고가 많아 보였다.
 const AD_EVERY = 6;
+// 2026-11-12 사용자: 메인·서브를 뺀 원사이트 광고 송출 중단 — 다음 검색 등록이 승인되면 true 로 바꿔 다시 빌드한다.
+const ADS_ON = false;
+const AD_HEAD = '<meta name="google-adsense-account" content="ca-pub-8832347985556850">\n'
+  + '  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8832347985556850" crossorigin="anonymous"></script>';
+const AD_TOP = '<aside class="ad-slot" aria-label="광고"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8832347985556850"'
+  + ' data-ad-slot="5112804374" data-ad-format="auto" data-full-width-responsive="true"></ins>'
+  + '<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script></aside>';
+// 템플릿(public/index.html)에서는 광고를 늘 빼 두고, 켤 때만 빌드가 다시 넣는다 (껐다 켜도 원래대로).
+const stripAds = (h) => h
+  .replace(/\s*<meta name="google-adsense-account"[^>]*>/g, '')
+  .replace(/\s*<script async src="https:\/\/pagead2\.googlesyndication\.com[^>]*>\s*<\/script>/g, '')
+  .replace(/\s*<aside class="ad-slot[^"]*"[^>]*>[\s\S]*?<\/aside>/g, '')
+  .replace(/\s*<!-- ads-top -->/g, '');
 // 2026-10-29: 페이지별 발행일과 목록 갱신일. 카드(제도) 내용을 바꾸면 LIST_UPDATED·LIST_UPDATED_KO 도 같이 바꾼다.
 const LIST_UPDATED = '2026-11-11';
 const LIST_UPDATED_KO = '2026년 11월 11일';
@@ -102,7 +115,7 @@ const tagClassOf = (category) => category === '가족' ? 'family'
   : category === '중장년' ? 'middle'
   : category === '대출·환급' ? 'finance' : '';
 
-const adUnit = () => '<aside class="ad-slot in-grid" aria-label="광고">'
+const adUnit = () => !ADS_ON ? '' : '<aside class="ad-slot in-grid" aria-label="광고">'
   + '<ins class="adsbygoogle" style="display:block"'
   + ' data-ad-client="ca-pub-8832347985556850"'
   + ' data-ad-slot="3755490673"'
@@ -173,7 +186,7 @@ const jsonLdOf = (category, list) => {
 };
 
 // 템플릿에 이전 주입이 남아 있으면 지운다. 빌드를 여러 번 돌려도 결과가 같아야 한다.
-const template = readFileSync('public/index.html', 'utf8')
+const template = stripAds(readFileSync('public/index.html', 'utf8'))
   .replace(/\s*<script>window\.CATEGORY=[^<]*<\/script>/g, '');
 let made = 0;
 
@@ -214,6 +227,10 @@ for (const category of CATEGORIES) {
   if (category.slug) {
     html = html.replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${esc(category.title)}$2`);
     html = html.replace(/(<meta name="twitter:title" content=")[^"]*(")/, `$1${esc(category.title)}$2`);
+  }
+  if (ADS_ON) {
+    html = html.replace('</title>', `</title>\n  ${AD_HEAD}`);
+    html = html.replace(/(<div class="cards" id="cards">)/, `${AD_TOP}\n      $1`);
   }
   html = html.replace('<script src="/script.js" defer></script>',
     `<script>window.CATEGORY=${JSON.stringify(category.name)};<\/script>\n  <script src="/script.js" defer></script>`);
@@ -258,8 +275,8 @@ const detailHtml = (d) => {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="${esc(d.desc)}">
-  <meta name="robots" content="index,follow,max-image-preview:large">
-  <meta name="google-adsense-account" content="${AD_CLIENT}">
+  <meta name="robots" content="index,follow,max-image-preview:large">${ADS_ON ? `
+  <meta name="google-adsense-account" content="${AD_CLIENT}">` : ''}
   <link rel="canonical" href="${url}">
   <meta property="og:type" content="article">
   <meta property="og:locale" content="ko_KR">
@@ -269,8 +286,8 @@ const detailHtml = (d) => {
   <meta property="og:description" content="${esc(d.desc)}">
   <meta property="og:image" content="${SITE}/og-benefit-v2.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#f7f7f2">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CLIENT}" crossorigin="anonymous"></script>
+  <meta name="theme-color" content="#f7f7f2">${ADS_ON ? `
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CLIENT}" crossorigin="anonymous"></script>` : ''}
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-EZWW0615H1"></script>
   <script>
@@ -303,8 +320,8 @@ const detailHtml = (d) => {
         ${d.rows.map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`).join('\n        ')}
       </tbody></table></div>
     </section>
-
-    <aside class="ad-slot" aria-label="광고"><ins class="adsbygoogle" style="display:block" data-ad-client="${AD_CLIENT}" data-ad-slot="3755490673" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></aside>
+${ADS_ON ? `
+    <aside class="ad-slot" aria-label="광고"><ins class="adsbygoogle" style="display:block" data-ad-client="${AD_CLIENT}" data-ad-slot="3755490673" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></aside>` : ''}
 
     <section aria-labelledby="check-title">
       <h2 id="check-title">나도 받을 수 있을까? 체크해 보기</h2>
