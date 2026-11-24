@@ -13,6 +13,10 @@ export default {
       url.protocol = 'https:';
       return Response.redirect(url.toString(), 301);
     }
-    return env.ASSETS.fetch(request);
+    // 2026-11-24: 이 주소는 늘 https 로만 열도록 브라우저에 알린다(HSTS). _worker.js 가 있으면 _headers 가 적용되지 않아 여기서 붙인다.
+    const res = await env.ASSETS.fetch(request);
+    const out = new Response(res.body, res);
+    out.headers.set('Strict-Transport-Security', 'max-age=31536000');
+    return out;
   },
 };
